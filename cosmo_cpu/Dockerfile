@@ -36,10 +36,10 @@ RUN cd /usr/local/cosmo/cosmo/ACC && cp Options.docker.pgi.cpu Options && \
 ENV COSMO_HOME=/usr/local/cosmo
 ENV PATH=$PATH:/usr/local/cosmo/cosmo/ACC
 
-# prepare workdir with cosmo1_lpi/test_1
+# prepare workdir with cosmo-2e,test_1
 RUN mkdir -p /data
-RUN cd $COSMO_HOME/cosmo/test/testsuite/data && ./get_data.sh && cp -r cosmo1_lpi/test_1/* /data/.
-RUN ln -s /usr/local/cosmo/cosmo/test/testsuite/data/cosmo1_lpi/input /data/.
+RUN cd $COSMO_HOME/cosmo/test/testsuite/data && ./get_data.sh && cp -r cosmo-2e/test_1/* /data/.
+RUN ln -s /usr/local/cosmo/cosmo/test/testsuite/data/cosmo-2e/input /data/.
 RUN cd /data && rm YU* && mkdir -p output
 
 WORKDIR /data
