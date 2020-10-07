@@ -41,7 +41,8 @@ RUN mkdir -p /data
 RUN cd $COSMO_HOME/cosmo/test/testsuite/data && ./get_data.sh && cp -r cosmo-2e/test_1/* /data/.
 RUN ln -s /usr/local/cosmo/cosmo/test/testsuite/data/cosmo-2e/input /data/.
 RUN cd /data && rm YU* && mkdir -p output
-
+ENV GRIB_DEFINITION_PATH=/usr/local/libgrib_api/v1.20.0.2/pgi/cosmo_definitions/definitions/:/usr/local/libgrib_api/v1.20.0.2/pgi/share/grib_api/definitions/
+ENV GRIB_SAMPLES_PATH=/usr/local/libgrib_api/v1.20.0.2/pgi/cosmo_definitions/samples/
 WORKDIR /data
 
 
