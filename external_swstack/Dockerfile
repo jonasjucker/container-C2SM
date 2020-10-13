@@ -97,15 +97,18 @@ RUN apt-get update -y && \
         wget && \
     rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://www.open-mpi.org/software/ompi/v3.0/downloads/openmpi-3.0.0.tar.bz2 && \
-    mkdir -p /var/tmp && tar -x -f /var/tmp/openmpi-3.0.0.tar.bz2 -C /var/tmp -j && \
-    cd /var/tmp/openmpi-3.0.0 &&  ./configure --prefix=/usr/local/openmpi --disable-getpwuid --enable-orterun-prefix-by-default --with-cuda=/usr/local/cuda --with-verbs \
-    --with-pmi=/usr --with-pmi-libdir=/usr/lib/x86_64-linux-gnu CFLAGS=-I/usr/include/slurm && \
-    make -j$(nproc) && \
-    make -j$(nproc) install && \
-    rm -rf /var/tmp/openmpi-3.0.0.tar.bz2 /var/tmp/openmpi-3.0.0
-ENV LD_LIBRARY_PATH=/usr/local/openmpi/lib:$LD_LIBRARY_PATH \
-    PATH=/usr/local/openmpi/bin:$PATH
+RUN wget -q http://www.mpich.org/static/downloads/3.1.4/mpich-3.1.4.tar.gz \
+    && tar xf mpich-3.1.4.tar.gz \
+    && cd mpich-3.1.4 \
+    && ./configure --enable-fast=all,O3 --prefix=/usr/local/mpich \
+    && make -j$(nproc) \
+    && make install \
+    && ldconfig \
+    && cd .. \
+    && rm -rf mpich-3.1.4 \
+    && rm mpich-3.1.4.tar.gz
+ENV LD_LIBRARY_PATH=/usr/local/mpich/lib:$LD_LIBRARY_PATH \
+    PATH=/usr/local/mpich/bin/:$PATH
 
 ## CMake version 3.14.5
 RUN apt-get update -y && \
@@ -168,22 +171,6 @@ RUN mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://
 ENV LD_LIBRARY_PATH=/usr/local/netcdf/lib:$LD_LIBRARY_PATH \
     PATH=/usr/local/netcdf/bin:$PATH
 
-# Boost version 1.67.0
-RUN apt-get update -y && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        bzip2 \
-        libbz2-dev \
-        tar \
-        wget \
-        zlib1g-dev && \
-    rm -rf /var/lib/apt/lists/*
-RUN mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://dl.bintray.com/boostorg/release/1.67.0/source/boost_1_67_0.tar.bz2 && \
-    mkdir -p /var/tmp && tar -x -f /var/tmp/boost_1_67_0.tar.bz2 -C /var/tmp -j && \
-    cd /var/tmp/boost_1_67_0 && ./bootstrap.sh --prefix=/usr/local/boost --without-libraries=python && \
-    ./b2 -j$(nproc) -q install && \
-    rm -rf /var/tmp/boost_1_67_0.tar.bz2 /var/tmp/boost_1_67_0
-ENV LD_LIBRARY_PATH=/usr/local/boost/lib:$LD_LIBRARY_PATH
-
 # perl 5.16.3 (needed by automake 1.13)
 RUN cd /var/tmp && \
     wget https://www.cpan.org/src/5.0/perl-5.16.3.tar.gz && \
@@ -206,4 +193,5 @@ RUN cd /var/tmp && \
     cd automake-1.13 && \
     ./configure && \
     make -j$(nproc) && \
-    make install 
+    make install && \
+    rm -rf /var/tmp/automake-1.13.tar.gz
