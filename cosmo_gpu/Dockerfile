@@ -11,16 +11,20 @@ RUN cd /usr/local/libgrib1/source && \
     make -f Makefile.kesch.pgi -j3 && \
     cp /usr/local/libgrib1/source/lib* /usr/local/libgrib1/.
 
-# libgrib-api 
-COPY libgrib-api /var/tmp/libgrib-api
-RUN cd /var/tmp/libgrib-api && \
-    ./configure --build=x86_64 --host=x86_64 --prefix=/usr/local/libgrib_api/v1.20.0.2/pgi  --enable-static enable_shared=no --disable-jpeg && \
-    make install -j$(nproc) && \
-    echo 'export GRIB_DEFINITION_PATH=/usr/local/libgrib_api/v1.20.0.2/pgi/cosmo_definitions/definitions/:/usr/local/libgrib_api/v1.20.0.2/pgi/share/grib_api/definitions/\n \
-      export GRIB_SAMPLES_PATH=/usr/local/libgrib_api/v1.20.0.2/pgi/cosmo_definitions/samples/\n' \
-    >> /usr/local/libgrib_api/v1.20.0.2/pgi/configuration.sh
+# ECCODES 2.14
+COPY eccodes-2.14.1-Source /var/tmp/eccodes
+RUN cd /var/tmp/ && \
+    mkdir build && cd build && \
+    cmake -DCMAKE_INSTALL_PREFIX=/usr/local/eccodes \
+    -DENABLE_JPG_LIBJASPER=ON -DCMAKE_Fortran_COMPILER=pgfortran ../eccodes && \
+    make -j $(nproc) && \
+    ctest && \
+    make install 
 
-COPY ./cosmo_definitions/ /usr/local/libgrib_api/v1.20.0.2/pgi/cosmo_definitions
+# eccodes-cosmo-resources
+COPY ./eccodes-cosmo-resources /usr/local/eccodes/eccodes-cosmo-resources
+ENV GRIB_DEFINITION_PATH=/usr/local/eccodes/eccodes-cosmo-resources/definitions:/usr/local/eccodes/share/eccodes/definitions/
+ENV GRIB_SAMPLES_PATH=/usr/local/eccodes/eccodes-cosmo-resources/samples/
 
 # libjasper 
 COPY libjasper /var/tmp/libjasper
@@ -58,17 +62,17 @@ RUN cd /var/tmp/serialbox && mkdir build && cd build && \
 
 # COSMO-ORG 
 COPY ./cosmo /usr/local/cosmo
-RUN cd /usr/local/cosmo/dycore && mkdir dycore_build && cd dycore_build && \
-    cmake ../. -DCMAKE_BUILD_TYPE=Release \
-    -DGridTools_DIR=/usr/local/gridtools/lib/cmake/GridTools/ \
-    -DDYCORE_TARGET_ARCHITECTURE=gpu \
-    -DCMAKE_INSTALL_PREFIX=/usr/local/cosmo/dycore/install_release \
-    -DCUDA_CUDART=/usr/local/cuda/lib64 \
-    -DCUDAToolkit_INCLUDE_DIR=/usr/local/cuda-11.0/include/ \
-    -DCUDA_ARCH=sm_60 \
-    -DSerialbox_DIR=/usr/local/serialbox/cmake/ \
-    -DGT_ENABLE_BINDINGS_GENERATION=ON \
-    -DCMAKE_FIND_PACKAGE_NO_PACKAGE_REGISTRY=ON 
+#RUN cd /usr/local/cosmo/dycore && mkdir dycore_build && cd dycore_build && \
+#    cmake ../. -DCMAKE_BUILD_TYPE=Release \
+#    -DGridTools_DIR=/usr/local/gridtools/lib/cmake/GridTools/ \
+#    -DDYCORE_TARGET_ARCHITECTURE=gpu \
+#    -DCMAKE_INSTALL_PREFIX=/usr/local/cosmo/dycore/install_release \
+#    -DCUDA_CUDART=/usr/local/cuda/lib64 \
+#    -DCUDAToolkit_INCLUDE_DIR=/usr/local/cuda-11.0/include/ \
+#    -DCUDA_ARCH=sm_60 \
+#    -DSerialbox_DIR=/usr/local/serialbox/cmake/ \
+#    -DGT_ENABLE_BINDINGS_GENERATION=ON \
+#    -DCMAKE_FIND_PACKAGE_NO_PACKAGE_REGISTRY=ON 
 
 #DYCORE
 
