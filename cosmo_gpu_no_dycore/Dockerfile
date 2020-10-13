@@ -11,22 +11,29 @@ RUN cd /usr/local/libgrib1/source && \
     make -f Makefile.kesch.pgi -j3 && \
     cp /usr/local/libgrib1/source/lib* /usr/local/libgrib1/.
 
-# libgrib-api 
-COPY libgrib-api /var/tmp/libgrib-api
-RUN cd /var/tmp/libgrib-api && \
-    ./configure --build=x86_64 --host=x86_64 --prefix=/usr/local/libgrib_api/v1.20.0.2/pgi  --enable-static enable_shared=no --disable-jpeg && \
-    make install -j$(nproc) && \
-    echo 'export GRIB_DEFINITION_PATH=/usr/local/libgrib_api/v1.20.0.2/pgi/cosmo_definitions/definitions/:/usr/local/libgrib_api/v1.20.0.2/pgi/share/grib_api/definitions/\n \
-      export GRIB_SAMPLES_PATH=/usr/local/libgrib_api/v1.20.0.2/pgi/cosmo_definitions/samples/\n' \
-    >> /usr/local/libgrib_api/v1.20.0.2/pgi/configuration.sh
-
-COPY ./cosmo_definitions/ /usr/local/libgrib_api/v1.20.0.2/pgi/cosmo_definitions
-
 # libjasper 
 COPY libjasper /var/tmp/libjasper
 RUN cd /var/tmp/libjasper && \
     export libjasper_install=/usr/local/libjasper/ && \
-    ./install.sh
+    ./install.sh && \
+    rm -rf /var/tmp/libjasper
+
+# ECCODES 2.14
+COPY eccodes-2.14.1-Source /var/tmp/eccodes
+RUN cd /var/tmp/ && \
+    mkdir build && cd build && \
+    cmake -DCMAKE_INSTALL_PREFIX=/usr/local/eccodes \
+    -DENABLE_JPG_LIBJASPER=ON -DCMAKE_Fortran_COMPILER=pgfortran ../eccodes && \
+    make -j $(nproc) && \
+    ctest && \
+    make install && \
+    rm -rf /var/tmp/eccodes
+ENV LD_LIBRARY_PATH=/usr/local/eccodes/lib:$LD_LIBRARY_PATH  
+
+# eccodes-cosmo-resources
+COPY ./eccodes-cosmo-resources /usr/local/eccodes/eccodes-cosmo-resources
+ENV GRIB_DEFINITION_PATH=/usr/local/eccodes/eccodes-cosmo-resources/definitions:/usr/local/eccodes/share/eccodes/definitions/
+ENV GRIB_SAMPLES_PATH=/usr/local/eccodes/eccodes-cosmo-resources/samples/
 
 # COSMO-ORG without dycore 
 COPY ./cosmo /usr/local/cosmo
@@ -36,14 +43,11 @@ RUN cd /usr/local/cosmo/cosmo/ACC && cp Options.docker.pgi.gpu Options && \
 ENV COSMO_HOME=/usr/local/cosmo
 ENV PATH=$PATH:/usr/local/cosmo/cosmo/ACC
 
-# prepare workdir with cosmo-2e,test_1
-RUN mkdir -p /data
-RUN cd $COSMO_HOME/cosmo/test/testsuite/data && ./get_data.sh && cp -r cosmo-2e/test_1/* /data/.
-RUN ln -s /usr/local/cosmo/cosmo/test/testsuite/data/cosmo-2e/input /data/.
-RUN cd /data && rm YU* && mkdir -p output
-ENV GRIB_DEFINITION_PATH=/usr/local/libgrib_api/v1.20.0.2/pgi/cosmo_definitions/definitions/:/usr/local/libgrib_api/v1.20.0.2/pgi/share/grib_api/definitions/
-ENV GRIB_SAMPLES_PATH=/usr/local/libgrib_api/v1.20.0.2/pgi/cosmo_definitions/samples/
+ENV COSMO_HOME=/usr/local/cosmo
+ENV PATH=$PATH:/usr/local/cosmo/cosmo/ACC
+ENV PATH=/usr/local/eccodes/bin/:$PATH
+
+# Cuda driver
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/compat/
+
 WORKDIR /data
-
-
