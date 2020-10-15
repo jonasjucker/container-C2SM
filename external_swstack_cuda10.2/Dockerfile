@@ -2,15 +2,14 @@
 # external software stack for HPC COSMO image
 # 
 # Contents:
-#   CUDA version 11.0
+#   CUDA version 10.2
 #   HDF5 version 1.10.1
-#   Mellanox OFED version 5.0-2.1.8.0 
-#   OpenMPI version 3.0.0
+#   MPICH version 3.1.4
 #   PGI compilers version 20.7
 #   Python 2 and 3 (upstream)
 # 
 
-FROM nvidia/cuda:11.0-devel-ubuntu20.04 AS devel
+FROM nvidia/cuda:10.2-devel-ubuntu18.04 AS devel
 ARG nproc=8
 
 # Python
@@ -43,23 +42,10 @@ ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility \
     NVIDIA_REQUIRE_CUDA="cuda>=10.1 brand=tesla,driver>=384,driver<385 brand=tesla,driver>=396,driver<397 brand=tesla,driver>=410,driver<411" \
     NVIDIA_VISIBLE_DEVICES=all
 
-
 ## MPICH 3.1.4
 RUN apt-get update -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        bzip2 \
         build-essential \
-        ca-certificates \
-        automake \
-        autoconf \
-        libpmi2-0-dev \
-        file \
-        hwloc \
-        libnuma-dev \
-        make \
-        openssh-client \
-        perl \
-        tar \
         wget && \
     rm -rf /var/lib/apt/lists/*
 
@@ -67,7 +53,7 @@ RUN wget -q http://www.mpich.org/static/downloads/3.1.4/mpich-3.1.4.tar.gz \
     && tar xf mpich-3.1.4.tar.gz \
     && cd mpich-3.1.4 \
     && ./configure --enable-fast=all,O3 --prefix=/usr \
-    && make -j$(nproc) \
+    && make -j $(nproc) \
     && make install \
     && ldconfig \
     && cd .. \

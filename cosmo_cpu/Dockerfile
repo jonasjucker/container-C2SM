@@ -1,8 +1,8 @@
 # 
 # HPC COSMO image
 
-FROM juckerj/external_swstack:mpich_fixed
-ARG nproc=4
+FROM juckerj/external_swstack:cuda11
+ARG nproc=8
 
 # libgrib1
 COPY libgrib1/libgrib1_cosmo/ /usr/local/libgrib1
