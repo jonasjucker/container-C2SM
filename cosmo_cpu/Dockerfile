@@ -1,7 +1,6 @@
 # 
 # HPC COSMO image
-
-FROM juckerj/external_swstack:cuda11
+FROM juckerj/external_swstack:cuda10.2
 ARG nproc=8
 
 # libgrib1
