@@ -39,13 +39,24 @@ ENV LD_LIBRARY_PATH=/opt/nvidia/hpc_sdk/Linux_x86_64/20.7/comm_libs/nvshmem/lib:
     PATH=/opt/nvidia/hpc_sdk/Linux_x86_64/20.7/comm_libs/nvshmem/bin:/opt/nvidia/hpc_sdk/Linux_x86_64/20.7/comm_libs/nccl/bin:/opt/nvidia/hpc_sdk/Linux_x86_64/20.7/profilers/bin:/opt/nvidia/hpc_sdk/Linux_x86_64/20.7/compilers/bin:/opt/nvidia/hpc_sdk/Linux_x86_64/20.7/cuda/bin:$PATH
 
 ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility \
-    NVIDIA_REQUIRE_CUDA="cuda>=10.1 brand=tesla,driver>=384,driver<385 brand=tesla,driver>=396,driver<397 brand=tesla,driver>=410,driver<411" \
     NVIDIA_VISIBLE_DEVICES=all
 
 ## MPICH 3.1.4
 RUN apt-get update -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        bzip2 \
         build-essential \
+        ca-certificates \
+        automake \
+        autoconf \
+        libpmi2-0-dev \
+        file \
+        hwloc \
+        libnuma-dev \
+        make \
+        openssh-client \
+        perl \
+        tar \
         wget && \
     rm -rf /var/lib/apt/lists/*
 
