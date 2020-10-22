@@ -36,13 +36,38 @@ COPY ./eccodes-cosmo-resources /usr/local/eccodes/eccodes-cosmo-resources
 ENV GRIB_DEFINITION_PATH=/usr/local/eccodes/eccodes-cosmo-resources/definitions:/usr/local/eccodes/share/eccodes/definitions/
 ENV GRIB_SAMPLES_PATH=/usr/local/eccodes/eccodes-cosmo-resources/samples/
 
-# Gritool Dycore 2.0
+# Boost version 1.67.0
 RUN apt-get update -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         build-essential \
-        libboost-all-dev \
         gfortran \
+        python3 \
+        python3-numpy \
+        python3-nose \
+        bzip2 \
+        libbz2-dev \
+        tar \
+        wget \
+        zlib1g-dev \
+        python-dev \
+        libxml2-dev \
+        libxslt-dev \
         git && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://dl.bintray.com/boostorg/release/1.67.0/source/boost_1_67_0.tar.bz2 && \
+    mkdir -p /var/tmp && tar -x -f /var/tmp/boost_1_67_0.tar.bz2 -C /var/tmp -j && \
+    cd /var/tmp/boost_1_67_0 && \
+    ./bootstrap.sh --prefix=/usr/local/boost && \
+    ./b2 -j$(nproc) -q install && \
+    rm -rf /var/tmp/boost_1_67_0.tar.bz2 /var/tmp/boost_1_67_0
+ENV LD_LIBRARY_PATH=/usr/local/boost/lib:$LD_LIBRARY_PATH
+
+# Gritool Dycore 2.0
+# Dummy libboost installation is needed, else the CMAKE does not find Boost, altough it is install in /usr/local/boost
+RUN apt-get update -y && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    libboost-serialization1.65-dev  && \
     rm -rf /var/lib/apt/lists/*
 
 COPY gridtools /var/tmp/gridtools
@@ -52,25 +77,11 @@ RUN cd /var/tmp/gridtools && \
     cmake -DCUDAToolkit_INCLUDE_DIR=/usr/local/cuda/include \
     -DCUDA_CUDART=/usr/local/cuda/lib64/ \
     -DCMAKE_INSTALL_PREFIX=/usr/local/gridtools \
+    -DBOOST_ROOT=/usr/local/boost \
+    -DBOOST_INCLUDEDIR=/usr/local/boost/include/boost \
     ../.  && \
-    make && \
+    make -j$(nproc) && \
     make install
-
-# Boost version 1.67.0
-RUN apt-get update -y && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        bzip2 \
-        libbz2-dev \
-        tar \
-        wget \
-        zlib1g-dev && \
-    rm -rf /var/lib/apt/lists/*
-RUN mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://dl.bintray.com/boostorg/release/1.67.0/source/boost_1_67_0.tar.bz2 && \
-    mkdir -p /var/tmp && tar -x -f /var/tmp/boost_1_67_0.tar.bz2 -C /var/tmp -j && \
-    cd /var/tmp/boost_1_67_0 && ./bootstrap.sh --prefix=/usr/local/boost --without-libraries=python && \
-    ./b2 -j$(nproc) -q install && \
-    rm -rf /var/tmp/boost_1_67_0.tar.bz2 /var/tmp/boost_1_67_0
-ENV LD_LIBRARY_PATH=/usr/local/boost/lib:$LD_LIBRARY_PATH
 
 # Serialbox
 COPY serialbox /var/tmp/serialbox
@@ -82,9 +93,8 @@ RUN cd /var/tmp/serialbox && mkdir build && cd build && \
     -DCMAKE_CXX_COMPILER=g++ \
     -DBOOST_ROOT=/usr/local/boost \
     -DBoost_NO_SYSTEM_PATHS=ON \
-    -DCMAKE_EXPORT_NO_PACKAGE_REGISTRY=ON \
-    -DBoost_NO_BOOST_CMAKE=OFF && \
-    make -j 4 && \
+    -DCMAKE_EXPORT_NO_PACKAGE_REGISTRY=ON && \
+    make -j$(nproc) && \
     make install
 #
 ## COSMO-ORG 
@@ -100,14 +110,18 @@ RUN cd /usr/local/cosmo/dycore && mkdir dycore_build && cd dycore_build && \
     -DCUDA_ARCH=sm_60 \
     -DSerialbox_DIR=/usr/local/serialbox/cmake/ \
     -DGT_ENABLE_BINDINGS_GENERATION=ON \
-    -DCMAKE_FIND_PACKAGE_NO_PACKAGE_REGISTRY=ON 
+    -DCMAKE_FIND_PACKAGE_NO_PACKAGE_REGISTRY=ON \
+    -DBOOST_ROOT=/usr/local/boost
 
 #DYCORE
-RUN cd /usr/local/cosmo/dycore/dycore_build && make
-ENV INSTALL_DIR=/usr/local DYCORE_DIR=/usr/local/cosmo/dycore/install_release/ GRIDTOOLS_DIR=/usr/local/gridtools/ DYCOREGT=$DYCORE_DIR DYCOREGT_DIR=$DYCORE_DIR
+RUN cd /usr/local/cosmo/dycore/dycore_build && make -j$(nproc)
+RUN cd /usr/local/cosmo/dycore/dycore_build && make install
+ENV INSTALL_DIR=/usr/local DYCORE_DIR=/usr/local/cosmo/dycore/install_release/ 
+ENV GRIDTOOLS_DIR=/usr/local/gridtools/ DYCOREGT=$DYCORE_DIR DYCOREGT_DIR=$DYCORE_DIR
 
+#COSMO
 RUN cd /usr/local/cosmo/cosmo/ACC && cp Options.docker.pgi.gpu Options && \
-    make CPP_GT_DYCORE=1 -j 4
+    make CPP_GT_DYCORE=1 -j $(nproc)
 
 ENV COSMO_HOME=/usr/local/cosmo
 ENV PATH=$PATH:/usr/local/cosmo/cosmo/ACC
