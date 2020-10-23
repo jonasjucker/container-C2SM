@@ -47,7 +47,4 @@ ENV PATH=$PATH:/usr/local/cosmo/cosmo/ACC
 ENV COSMO_HOME=/usr/local/cosmo
 ENV PATH=$PATH:/usr/local/cosmo/cosmo/ACC
 
-# Cuda driver
-ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/compat/
-
 WORKDIR /data
