@@ -55,7 +55,7 @@ to the configure-script OpenMPI is configured correctly:
 More information about how to launch an OpenMPI-application with Sarus can be found in the section [Running MPI applications without the native MPI hook](https://sarus.readthedocs.io/en/stable/user/user_guide.html#running-mpi-applications-without-the-native-mpi-hook) of the official documentation.
 Note that this only works for CPU, multinode GPU-support of Sarus needs the MPICH-library for all cases.
 
-### COSMO-ORG (CPU)
+### COSMO(CPU)
 This image contains all COSMO-specific packages, most of them are private.
 * Libgrib1
 * Libjasper
@@ -68,3 +68,15 @@ The COSMO-ORG used in this container is a [fork](https://github.com/jonasjucker/
 No modifications took place in the code itself, rather some adjustements in the Options-files used to build as well as in the testsuite to launch the container using Sarus smoothly took place. The results of simulation do not differ from the original repository of COSMO-ORG.  
 As for the MPI-libraries, after succesful compilation of COSMO-ORG *ldconfig* is run in order to ensure correct function of the native-MPI hook of Sarus.
 The resulting binary **cosmo** is added to PATH.
+
+### COSMO(GPU)
+This images contains all COSMO-specific packages, most of them are private.
+* Libgrib1
+* Libjasper
+* Eccodes 2.14.1
+* Eccodes-cosmo-resources
+* Boost 1.67.0
+* Gridtools
+* Serialbox
+* COSMO-ORG
+
