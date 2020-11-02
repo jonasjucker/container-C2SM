@@ -22,3 +22,14 @@ This repository consist of three different directories, containing Dockerfiles a
 Additionaly it contains detailed description of key-aspects or major difficulties
 faced during the process of building an running the containers on Piz Daint at CSCS.
 This information is contained in the following files:
+
+* [Image Structure](image_structure.md)
+   - Description of the underlying structure of the images
+   - Explanations and detailed descriptions why certain options were choosen in the Dockerfiles
+   - Possible limitations for the future
+   - Tweaks necessary to use Sarus on Piz Daint
+   
+* [Build Images with Docker](build_image.md)
+   - How to build the images localy on your computer
+
+* [Test and Run COSMO within the container](test_and_run_container.md)
