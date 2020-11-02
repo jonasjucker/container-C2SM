@@ -14,7 +14,7 @@ on multiple GPU's.
 Because Piz Daint is the main target machine for the containers described in this document, they contain some tweaks or twist needed for Sarus. On another HPC-system some additional components may be required inside the container.
 
 ## Organization
-This repository consist of three differnt directories, each containing Dockerfiles to build images:
+This repository consist of three different directories, containing Dockerfiles and a TAG-file to build the images:
 * [External Software Stack](external_swtsack)
 * [COSMO for CPU](cosmo_cpu) (no CPP-dyocre)
 * [COSMO for GPU](cosmo_gpu) (with CPP-dycore)
