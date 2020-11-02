@@ -2,7 +2,7 @@
 This repository summarizes the experiences and difficulties to build and run a container for COSMO-ORG on both, CPU and GPU.
 The target machine for that container is Piz Daint at CSCS.
 
-This repository is the result of around 4 weeksof full-time work by Jonas Jucker.
+This repository is the result of around 4 weeks of full-time work by Jonas Jucker.
 The majority of the time was spent to figure out things for the GPU-version of COSMO.
 Many thanks also to the amazing support from Theofilos-Ioannis Manitaras!
 
