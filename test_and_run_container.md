@@ -59,7 +59,7 @@ juckerj/cosmo:cpu cosmo
 
 ## COSMO (GPU)
 Run the following command in a sandbox containing all INPUT namelists and all input data.
-The results of the simulation will be written at this location too.
+The results of the simulation will be written at this location too.  
 *LD_PRELOAD* is set to the Cuda-Driver on the compute nodes itself, *MPICH_RDMA_CUDA* enables direct
 communication between two GPU's. For detailed information about multi-GPU runs on Piz Daint, please read
 the section [NVIDIA-GPUDirect](https://sarus.readthedocs.io/en/stable/cookbook/gpu/gpudirect.html?highlight=MPICH#nvidia-gpudirect-rdma)
