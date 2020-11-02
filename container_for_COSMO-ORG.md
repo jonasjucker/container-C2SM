@@ -42,7 +42,7 @@ of the PGI. By passing *NVHPC_DEFAULT_CUDA=10.2* to the install-script, we ensur
 The default MPI-library of COSMO-ORG is OpenMPI. Sarus does not support the native-MPI hook with OpenMPI, therefore we use MPICH.
 More detailed descriptions about the MPI-hook of Sarus can be found in the [official documentation](https://sarus.readthedocs.io/en/stable/config/mpi-hook.html).
 It is very important, that the MPI-library is installed at a **standard location** inside the containers, if not, Sarus cannot find it and the MPI-hook does not work.  
-In our containers, the MPI-library is install at */usr*.
+In our containers, the MPI-library is install at */usr*. It is alo required to run *ldconfig* after installation of the MPI-library in order to use the native-MPI hook.
 
 #### OpenMPI (instead of MPICH)
 In case one wants to use the OpenMPI-library instead, it needs to be configured with *libpmi2*. By passing these options  
@@ -56,4 +56,13 @@ More information about how to launch an OpenMPI-application with Sarus can be fo
 Note that this only works for CPU, multinode GPU-support of Sarus needs the MPICH-library for all cases.
 
 ### COSMO-ORG (CPU)
+This image contains all COSMO-specific packages, most of them are private.
+* Libgrib1
+* Libjasper
+* Eccodes 2.14.1
+* Eccodes-cosmo-resources
+* COSMO-ORG
 
+#### COSMO-ORG
+The COSMO-ORG used in this container is a [fork](https://github.com/jonasjucker/cosmo/tree/docker) of Jonas Jucker. Branch *docker* is the one to use.
+No modifications took place in the code itself, rather some adjustements in the Options-files used to build as well as in the testsuite to launch the container using Sarus smoothly took place. The results of simulation do not differ from the original repository of COSMO-ORG.
