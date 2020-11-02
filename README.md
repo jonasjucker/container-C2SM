@@ -33,3 +33,5 @@ This information is contained in the following files:
    - How to build the images localy on your computer
 
 * [Test and Run COSMO within the container](test_and_run_container.md)
+   - How to run the testuite 
+   - How to run simulations within the container
