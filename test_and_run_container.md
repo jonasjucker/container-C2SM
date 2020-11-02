@@ -10,7 +10,7 @@ Run the following commands in the directory *cosmo/test/testsuite*:
  touch cosmo_cpu && \
  ./src/testsuite.py -n 12 -v 1 --color -f --tolerance=TOLERANCE_dp \
  --testlist=testlist_mch.xml -o testsuite.out --mpicmd=' srun -u \
- --ntasks-per-node=12 -C gpu -p debug \
+ --ntasks-per-node=12 -n &NTASKS -C gpu -p debug \
   sarus run --mpi --mount=type=bind,src=$PWD/../../../,target=$PWD/../../../ \
   --workdir=$PWD juckerj/cosmo:cpu'
 ```
@@ -18,7 +18,7 @@ Run the following commands in the directory *cosmo/test/testsuite*:
 ```bash
 /src/testsuite.py -n 12 -v 1 --color -f --tolerance=TOLERANCE_dp \
  --testlist=testlist_dwd.xml -o testsuite.out --mpicmd=' srun -u \
- --ntasks-per-node=12 -C gpu -p debug \
+ --ntasks-per-node=12 -n &NTASKS -C gpu -p debug \
   sarus run --mpi --mount=type=bind,src=$PWD/../../../,target=$PWD/../../../ \
   --workdir=$PWD juckerj/cosmo:cpu'
   ```
