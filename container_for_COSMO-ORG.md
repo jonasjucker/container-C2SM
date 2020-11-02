@@ -15,13 +15,15 @@ Because Piz Daint is the main target machine for the containers described in thi
 
 ## Images
 The images/containers for COSMO-ORG are built in two steps, adding three images on top of each other.
+The first two images are shared by both CPU and GPU versions. The final images are separated, because for GPU one needs
+the Gridtools-library. The final images, containing some very COSMO-specific packages and COSMO itself, require access to some private GitHub repositories.
 
-### Base Image
+### Base Image (shared)
 As a base image we use an official CUDA image from NVIDIA.
 On Piz Daint the newest version supported is 10.2.
 Therefore we use **nvidia/cuda:10.2-devel-ubuntu18.04**
 
-### External Software Stack
+### External Software Stack (shared)
 On top of the CUDA image we install a whole bunch of libraries from source in order to compile COSMO-ORG on both CPU and GPU.  
    * PGI 20.7 
    * MPICH 3.1.4  
@@ -53,4 +55,5 @@ to the configure-script OpenMPI is configured correctly:
 More information about how to launch an OpenMPI-application with Sarus can be found in the section [Running MPI applications without the native MPI hook](https://sarus.readthedocs.io/en/stable/user/user_guide.html#running-mpi-applications-without-the-native-mpi-hook) of the official documentation.
 Note that this only works for CPU, multinode GPU-support of Sarus needs the MPICH-library for all cases.
 
+### COSMO-ORG (CPU)
 
