@@ -45,3 +45,27 @@ ulimit -a
 ```
 ** failing tests**
 * a lot still ongoing conversation with Theo from CSCS
+
+# Run container for experiments
+
+## COSMO (CPU)
+Run the following command in a sandbox containing all INPUT namelists and all input data.
+The results of the simulation will be written at this location too.
+```bash
+srun -n $NUMBER_OF_PROC -C gpu sarus run --mpi \
+--mount=type=bind,src=$PWD,target=$PWD --workdir=$PWD \
+juckerj/cosmo:cpu cosmo
+```
+
+## COSMO (GPU)
+Run the following command in a sandbox containing all INPUT namelists and all input data.
+The results of the simulation will be written at this location too.
+*LD_PRELOAD* is set to the Cuda-Driver on the compute nodes itself, *MPICH_RDMA_CUDA* enables direct
+communication between two GPU's. For detailed information about multi-GPU runs on Piz Daint, please read
+the section [NVIDIA-GPUDirect](https://sarus.readthedocs.io/en/stable/cookbook/gpu/gpudirect.html?highlight=MPICH#nvidia-gpudirect-rdma)
+of the official documentation.
+```bash
+srun -n $NUMBER_OF_PROC -C gpu sarus run --mpi \
+--mount=type=bind,src=$PWD,target=$PWD --workdir=$PWD \
+juckerj/cosmo:gpu bash -c 'export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libcuda.so; export MPICH_RDMA_ENABLED_CUDA=1; cosmo'
+```
