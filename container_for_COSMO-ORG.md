@@ -43,11 +43,12 @@ It is very important, that the MPI-library is installed at a **standard location
 In our containers, the MPI-library is install at */usr*.
 
 #### OpenMPI (instead of MPICH)
-In case one wants to use the OpenMPI-library instead, it needs to be configured with *libpmi2*. By passing the options  
+In case one wants to use the OpenMPI-library instead, it needs to be configured with *libpmi2*. By passing these options  
+to the configure-script OpenMPI is configured correctly: 
 * --with-pmi=/usr 
 * --with-pmi-libdir=/usr/lib/x86_64-linux-gnu  
 * CFLAGS=-I/usr/include/slurm  
-to the configure-script OpenMPI is configured correctly. 
+
 
 More information about how to launch an OpenMPI-application with Sarus can be found in the section [Running MPI applications without the native MPI hook](https://sarus.readthedocs.io/en/stable/user/user_guide.html#running-mpi-applications-without-the-native-mpi-hook) of the official documentation.
 Note that this only works for CPU, multinode GPU-support of Sarus needs the MPICH-library for all cases.
