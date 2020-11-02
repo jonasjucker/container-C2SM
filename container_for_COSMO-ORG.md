@@ -65,4 +65,6 @@ This image contains all COSMO-specific packages, most of them are private.
 
 #### COSMO-ORG
 The COSMO-ORG used in this container is a [fork](https://github.com/jonasjucker/cosmo/tree/docker) of Jonas Jucker. Branch *docker* is the one to use.
-No modifications took place in the code itself, rather some adjustements in the Options-files used to build as well as in the testsuite to launch the container using Sarus smoothly took place. The results of simulation do not differ from the original repository of COSMO-ORG.
+No modifications took place in the code itself, rather some adjustements in the Options-files used to build as well as in the testsuite to launch the container using Sarus smoothly took place. The results of simulation do not differ from the original repository of COSMO-ORG.  
+As for the MPI-libraries, after succesful compilation of COSMO-ORG *ldconfig* is run in order to ensure correct function of the native-MPI hook of Sarus.
+The resulting binary **cosmo** is added to PATH.
