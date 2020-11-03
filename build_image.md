@@ -23,3 +23,18 @@ as build-arguments to *docker build* as shown below.
  cd container-C2SM/cosmo_cpu # or cosmo_gpu for the GPU-version
  docker build -t $(cat TAG) . --build-arg ssh_prv_key="$(cat ~/.ssh/id_rsa)" --build-arg ssh_pub_key="$(cat ~/.ssh/id_rsa.pub)"
  ```
+
+## Pull Images from Dockerhub
+
+### External Software Stack
+This image is public, pull it by executing the following command:
+```bash
+ docker pull juckerj/external_swstack:cuda10.2 # replace docker with sarus on Piz Daint
+ ```
+ 
+ ### Cosmo (CPU and GPU)
+ These images are private. Contact me in case you want to be added as a collaborator.
+ To download execute the following command:
+ ```bash
+ sarus pull --login juckerj/cosmo:cpu # or gpu
+ ```
