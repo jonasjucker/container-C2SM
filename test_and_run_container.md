@@ -22,10 +22,7 @@ Run the following commands in the directory *cosmo/test/testsuite*:
   sarus run --mpi --mount=type=bind,src=$PWD/../../../,target=$PWD/../../../ \
   --workdir=$PWD juckerj/cosmo:cpu'
   ```
-  **failing tests**
-* *cosmo7/test_2* 
-   - MPI hangs when using --mpi option with Sarus, passing --mpi=pmi2 to srun instead resolves it.
-
+  
 ## COSMO (GPU)
 Run the following commands in the directory *cosmo/test/testsuite*:
 ```bash
@@ -43,8 +40,20 @@ ulimit -a
  --workdir=$PWD juckerj/cosmo:gpu'
 
 ```
-** failing tests**
-* a lot still ongoing conversation with Theo from CSCS
+### Results Testsuite for GPU
+The results for the testsuite are promising, altough many test do no fully validate.
+An exemplary [testsuite.out](testsuite.out) shows, that only very few variables differ (between 4 to 9 values in total).
+That there is a fundamental bug in the containerized version is rather unlikely, since all important fields like T,U,V or others are within
+tolerances. More likely the error come from the newer PGI version 20.7 that is not by any user of COSMO-ORG yet.
+
+Unfortunately the results of the testsuite are dependent on the number of nodes. Generally running on 1 node is fine, leading to the results 
+shown above. The results for higher number of nodes are very shaky and not always reproducable. It could be that we see again the random crashes
+of COSMO-ORG on Piz Daint!
+Theo is able to run on 3 nodes, leading to identical results as for 1 node.
+Why he can do that is not clear.
+
+Experiments on full-scale (Cosmo-2e) for benchmarking showed, that configurations that crash in the testsuite can run fine with other 
+settings or vice versa.
 
 # Run container for experiments
 
