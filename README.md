@@ -17,8 +17,13 @@ libraries as MPI during runtime with native implementations from the system. The
 on multiple GPU's.
 Because Piz Daint is the main target machine for the containers described in this document, they contain some tweaks or twist needed for Sarus. On another HPC-system some additional components may be required inside the container.
 
+## Reproducability of Results
+Exact predictions about the stability of the result from the containerized version of COSMO-ORG with respect to further upgrades of Piz Daint are not possible. 
+I discussed this subject with Theofilos-Ioannis Manitaras. His answer was:
 
+*"Regarding your question, having a container independent of the cray programming makes you less prone to problems due to upgrades. In any case, you still rely on the host's mpi and gpu driver to get the best performance. Since your mpich inside the container is among the abi compatible mpi libraries with the host mpi I don't expect any particular problems. You should always be aware though that the portability of containers does not ensure portability of performance."*
 
+Given that answer a containerized version of COSMO-ORG is a valuable option to keep in mind for the future.
 ## Organization
 This repository consist of three different directories, containing Dockerfiles and a TAG-file to build the images:
 * [External Software Stack](external_swtsack)
