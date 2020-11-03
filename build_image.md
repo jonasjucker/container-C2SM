@@ -21,5 +21,5 @@ To access the private GitHub repositories, the ssh-keys are used to clone them d
 as build-arguments to *docker build* as shown below.
  ```bash
  cd container-C2SM/cosmo_cpu # or cosmo_gpu for the GPU-version
- docker build -t $(cat TAG) . --build-arg ssh_prv_key="$(cat ~/.ssh/id_rsa)" --build-arg ssh_pub_key="$(cat ~/.ssh/id_rsa.pub)
+ docker build -t $(cat TAG) . --build-arg ssh_prv_key="$(cat ~/.ssh/id_rsa)" --build-arg ssh_pub_key="$(cat ~/.ssh/id_rsa.pub)"
  ```
