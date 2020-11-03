@@ -5,8 +5,6 @@ FROM juckerj/external_swstack:cuda10.2
 ARG nproc=8
 ARG ssh_prv_key
 ARG ssh_pub_key
-ENV DEBIAN_FRONTEND=noninteractive
-
 
 RUN apt-get update -y && \
     apt-get install -y --no-install-recommends \

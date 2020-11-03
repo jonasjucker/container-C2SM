@@ -1,27 +1,21 @@
 # 
 # external software stack for HPC COSMO image
 # 
-# Contents:
-#   CUDA version 10.2
-#   HDF5 version 1.10.1
-#   MPICH version 3.1.4
-#   PGI compilers version 20.7
-#   Python 2 and 3 (upstream)
-# 
 
 FROM nvidia/cuda:10.2-devel-ubuntu18.04 AS devel
 ARG nproc=8
+ENV DEBIAN_FRONTEND=noninteractive
 
 # Python
 RUN apt-get update -y && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    apt-get install -y --no-install-recommends \
         python \
         python3 vim && \
     rm -rf /var/lib/apt/lists/*
 
 # PGI compiler version 20.7
 RUN apt-get update -y && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    apt-get install -y --no-install-recommends \
         gcc \
         g++ \
         libnuma1 \
@@ -43,7 +37,7 @@ ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility \
 
 ## MPICH 3.1.4
 RUN apt-get update -y && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    apt-get install -y --no-install-recommends \
         bzip2 \
         build-essential \
         ca-certificates \
@@ -84,13 +78,14 @@ RUN mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://
 
 # HDF5 version 1.10.1
 RUN apt-get update -y && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    apt-get install -y --no-install-recommends \
         bzip2 \
         file \
         make \
         wget \
         zlib1g-dev && \
     rm -rf /var/lib/apt/lists/*
+
 RUN mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp http://www.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.1/src/hdf5-1.10.1.tar.bz2 && \
     mkdir -p /var/tmp && tar -x -f /var/tmp/hdf5-1.10.1.tar.bz2 -C /var/tmp -j && \
     cd /var/tmp/hdf5-1.10.1 &&  CC=pgcc CXX=pgc++ F77=pgfortran F90=pgfortran FC=pgfortran ./configure --prefix=/usr/local/hdf5 --enable-cxx --enable-fortran && \
@@ -104,7 +99,7 @@ ENV HDF5_DIR=/usr/local/hdf5 \
 # NetCDF version 4.6.1, NetCDF C++ version 4.3.0, NetCDF Fortran
 # version 4.4.4
 RUN apt-get update -y && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    apt-get install -y --no-install-recommends \
         ca-certificates \
         file \
         libcurl4-openssl-dev \
@@ -113,6 +108,7 @@ RUN apt-get update -y && \
         wget \
         zlib1g-dev && \
     rm -rf /var/lib/apt/lists/*
+
 RUN mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://www.unidata.ucar.edu/downloads/netcdf/ftp/netcdf-4.6.1.tar.gz && \
     mkdir -p /var/tmp && tar -x -f /var/tmp/netcdf-4.6.1.tar.gz -C /var/tmp -z && \
     cd /var/tmp/netcdf-4.6.1 &&  CC=pgcc CPPFLAGS=-I/usr/local/hdf5/include CXX=pgc++ F77=pgfortran F90=pgfortran FC=pgfortran LDFLAGS=-L/usr/local/hdf5/lib ./configure --prefix=/usr/local/netcdf && \
@@ -147,8 +143,9 @@ ENV PATH=/usr/local/bin/:$PATH
 
 # automake 1.13
 RUN apt-get update -y && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        autoconf
+    apt-get install -y --no-install-recommends \
+        autoconf && \
+    rm -rf /var/lib/apt/lists/*
 
 RUN cd /var/tmp && \
     wget http://ftp.gnu.org/gnu/automake/automake-1.13.tar.gz && \
