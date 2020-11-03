@@ -3,24 +3,47 @@
 
 FROM juckerj/external_swstack:cuda10.2
 ARG nproc=4
+ARG ssh_prv_key
+ARG ssh_pub_key
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update -y && \
+    apt-get install -y --no-install-recommends \
+        git && \
+    rm -rf /var/lib/apt/lists/*
+
+# Authorize SSH Host
+RUN mkdir -p /root/.ssh && \
+    chmod 0700 /root/.ssh && \
+    ssh-keyscan github.com > /root/.ssh/known_hosts
+
+# Add the keys and set permissions
+RUN echo "$ssh_prv_key" > /root/.ssh/id_rsa && \
+    echo "$ssh_pub_key" > /root/.ssh/id_rsa.pub && \
+    chmod 600 /root/.ssh/id_rsa && \
+    chmod 600 /root/.ssh/id_rsa.pub
 
 # libgrib1
-COPY libgrib1/libgrib1_cosmo/ /usr/local/libgrib1
+RUN git clone git@github.com:C2SM-RCM/libgrib1.git /var/tmp/libgrib1 && \
+    cp -r /var/tmp/libgrib1/libgrib1_cosmo /usr/local/libgrib1
 RUN cd /usr/local/libgrib1/source && \
     make clean -f Makefile.kesch.pgi -j$(nproc) && \
     make -f Makefile.kesch.pgi -j$(nproc) && \
-    cp /usr/local/libgrib1/source/lib* /usr/local/libgrib1/.
+    cp /usr/local/libgrib1/source/lib* /usr/local/libgrib1/. && \
+    rm -rf /var/tmp/libgrib1
 
 # libjasper 
-COPY libjasper /var/tmp/libjasper
-RUN cd /var/tmp/libjasper && \
+RUN git clone git@github.com:C2SM-RCM/libjasper.git /var/tmp/libjasper && \
+    cd /var/tmp/libjasper && \
     export libjasper_install=/usr/local/libjasper/ && \
     ./install.sh && \
     rm -rf /var/tmp/libjasper
 
 # ECCODES 2.14
-COPY eccodes-2.14.1-Source /var/tmp/eccodes
-RUN cd /var/tmp/ && \
+RUN mkdir -p /var/tmp/tar && wget -P /var/tmp/tar https://confluence.ecmwf.int/download/attachments/45757960/eccodes-2.14.1-Source.tar.gz && \
+    cd /var/tmp/tar && tar xpzf eccodes-2.14.1-Source.tar.gz && rm eccodes-2.14.1-Source.tar.gz && \
+    cp -r eccodes-2.14.1-Source /var/tmp/eccodes && rm -r /var/tmp/tar && \
+    cd /var/tmp/ && \
     mkdir build && cd build && \
     cmake -DCMAKE_INSTALL_PREFIX=/usr/local/eccodes \
     -DENABLE_JPG_LIBJASPER=ON -DCMAKE_Fortran_COMPILER=pgfortran ../eccodes && \
@@ -29,12 +52,16 @@ RUN cd /var/tmp/ && \
     make install && \
     rm -rf /var/tmp/eccodes
 ENV LD_LIBRARY_PATH=/usr/local/eccodes/lib:$LD_LIBRARY_PATH  
-ENV PATH=/usr/local/eccodes/bin/:$PATH
 
 # eccodes-cosmo-resources
-COPY ./eccodes-cosmo-resources /usr/local/eccodes/eccodes-cosmo-resources
+RUN git clone git@github.com:COSMO-ORG/eccodes-cosmo-resources.git \
+    /usr/local/eccodes/eccodes-cosmo-resources && \
+    cd /usr/local/eccodes/eccodes-cosmo-resources && \
+    git checkout 15f3a862d0349f4fc332e383c69acbed71b7804d
+    
 ENV GRIB_DEFINITION_PATH=/usr/local/eccodes/eccodes-cosmo-resources/definitions:/usr/local/eccodes/share/eccodes/definitions/
 ENV GRIB_SAMPLES_PATH=/usr/local/eccodes/eccodes-cosmo-resources/samples/
+ENV PATH=/usr/local/eccodes/bin/:$PATH
 
 # Boost version 1.67.0
 RUN apt-get update -y && \
@@ -70,7 +97,8 @@ RUN apt-get update -y && \
     libboost-serialization1.65-dev  && \
     rm -rf /var/lib/apt/lists/*
 
-COPY gridtools /var/tmp/gridtools
+RUN git clone git@github.com:GridTools/gridtools.git /var/tmp/gridtools && \
+    cd /var/tmp/gridtools && git checkout 8101c64
 ENV CXX=/usr/bin/g++ CC=/usr/bin/gcc FC=/usr/bin/gfortran CUDACXX=/opt/nvidia/hpc_sdk/Linux_x86_64/20.7/compilers/bin/nvcc CUDAHOSTCXX=/usr/bin/g++
 RUN cd /var/tmp/gridtools && \
     mkdir build && cd build && \
@@ -84,8 +112,8 @@ RUN cd /var/tmp/gridtools && \
     make install
 
 # Serialbox
-COPY serialbox /var/tmp/serialbox
-RUN cd /var/tmp/serialbox && mkdir build && cd build && \
+RUN git clone git@github.com:GridTools/serialbox.git /var/tmp/serialbox && \
+    cd /var/tmp/serialbox && mkdir build && cd build && \
     cmake ../. \
     -DCMAKE_INSTALL_PREFIX=/usr/local/serialbox \
     -DSERIALBOX_ENABLE_FORTRAN=true \
@@ -98,7 +126,7 @@ RUN cd /var/tmp/serialbox && mkdir build && cd build && \
     make install
 #
 ## COSMO-ORG 
-COPY ./cosmo /usr/local/cosmo
+RUN git clone --branch docker git@github.com:jonasjucker/cosmo.git /usr/local/cosmo 
 
 RUN cd /usr/local/cosmo/dycore && mkdir dycore_build && cd dycore_build && \
     cmake ../. -DCMAKE_BUILD_TYPE=Release \
@@ -122,9 +150,6 @@ ENV GRIDTOOLS_DIR=/usr/local/gridtools/ DYCOREGT=$DYCORE_DIR DYCOREGT_DIR=$DYCOR
 #COSMO
 RUN cd /usr/local/cosmo/cosmo/ACC && cp Options.docker.pgi.gpu Options && \
     make CPP_GT_DYCORE=1 -j $(nproc)
-
-ENV COSMO_HOME=/usr/local/cosmo
-ENV PATH=$PATH:/usr/local/cosmo/cosmo/ACC
 
 ENV COSMO_HOME=/usr/local/cosmo
 ENV PATH=$PATH:/usr/local/cosmo/cosmo/ACC

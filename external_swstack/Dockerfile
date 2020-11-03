@@ -1,28 +1,21 @@
 # 
 # external software stack for HPC COSMO image
 # 
-# Contents:
-#   CUDA version 11.0
-#   HDF5 version 1.10.1
-#   Mellanox OFED version 5.0-2.1.8.0 
-#   OpenMPI version 3.0.0
-#   PGI compilers version 20.7
-#   Python 2 and 3 (upstream)
-# 
 
-FROM nvidia/cuda:11.0-devel-ubuntu20.04 AS devel
+FROM nvidia/cuda:10.2-devel-ubuntu18.04 AS devel
 ARG nproc=8
+ENV DEBIAN_FRONTEND=noninteractive
 
 # Python
 RUN apt-get update -y && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    apt-get install -y --no-install-recommends \
         python \
         python3 vim && \
     rm -rf /var/lib/apt/lists/*
 
 # PGI compiler version 20.7
 RUN apt-get update -y && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    apt-get install -y --no-install-recommends \
         gcc \
         g++ \
         libnuma1 \
@@ -33,20 +26,18 @@ RUN apt-get update -y && \
 RUN mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P \
     /var/tmp https://developer.download.nvidia.com/hpc-sdk/nvhpc_2020_207_Linux_x86_64_cuda_multi.tar.gz && \
     mkdir -p /var/tmp && tar -x -f /var/tmp/nvhpc_2020_207_Linux_x86_64_cuda_multi.tar.gz -C /var/tmp -z && \
-    cd /var/tmp/nvhpc_2020_207_Linux_x86_64_cuda_multi && NVHPC_ACCEPT_EULA=accept NVHPC_INSTALL_DIR=/opt/nvidia/hpc_sdk NVHPC_SILENT=true ./install && \
+    cd /var/tmp/nvhpc_2020_207_Linux_x86_64_cuda_multi && NVHPC_ACCEPT_EULA=accept NVHPC_INSTALL_DIR=/opt/nvidia/hpc_sdk NVHPC_SILENT=true NVHPC_DEFAULT_CUDA=10.2 ./install && \
     rm -rf /var/tmp/nvhpc_2020_207_Linux_x86_64_cuda_multi /var/tmp/nvhpc_2020_207_Linux_x86_64_cuda_multi.tar.gz
 ENV LD_LIBRARY_PATH=/opt/nvidia/hpc_sdk/Linux_x86_64/20.7/comm_libs/nvshmem/lib:/opt/nvidia/hpc_sdk/Linux_x86_64/20.7/comm_libs/nccl/lib:/opt/nvidia/hpc_sdk/Linux_x86_64/20.7/math_libs/lib64:/opt/nvidia/hpc_sdk/Linux_x86_64/20.7/compilers/lib:/opt/nvidia/hpc_sdk/Linux_x86_64/20.7/cuda/lib64:$LD_LIBRARY_PATH \
     MANPATH=/opt/nvidia/hpc_sdk/Linux_x86_64/20.7/compilers/man:$MANPATH \
     PATH=/opt/nvidia/hpc_sdk/Linux_x86_64/20.7/comm_libs/nvshmem/bin:/opt/nvidia/hpc_sdk/Linux_x86_64/20.7/comm_libs/nccl/bin:/opt/nvidia/hpc_sdk/Linux_x86_64/20.7/profilers/bin:/opt/nvidia/hpc_sdk/Linux_x86_64/20.7/compilers/bin:/opt/nvidia/hpc_sdk/Linux_x86_64/20.7/cuda/bin:$PATH
 
 ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility \
-    NVIDIA_REQUIRE_CUDA="cuda>=10.1 brand=tesla,driver>=384,driver<385 brand=tesla,driver>=396,driver<397 brand=tesla,driver>=410,driver<411" \
     NVIDIA_VISIBLE_DEVICES=all
-
 
 ## MPICH 3.1.4
 RUN apt-get update -y && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    apt-get install -y --no-install-recommends \
         bzip2 \
         build-essential \
         ca-certificates \
@@ -67,7 +58,7 @@ RUN wget -q http://www.mpich.org/static/downloads/3.1.4/mpich-3.1.4.tar.gz \
     && tar xf mpich-3.1.4.tar.gz \
     && cd mpich-3.1.4 \
     && ./configure --enable-fast=all,O3 --prefix=/usr \
-    && make -j$(nproc) \
+    && make -j $(nproc) \
     && make install \
     && ldconfig \
     && cd .. \
@@ -87,13 +78,14 @@ RUN mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://
 
 # HDF5 version 1.10.1
 RUN apt-get update -y && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    apt-get install -y --no-install-recommends \
         bzip2 \
         file \
         make \
         wget \
         zlib1g-dev && \
     rm -rf /var/lib/apt/lists/*
+
 RUN mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp http://www.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.1/src/hdf5-1.10.1.tar.bz2 && \
     mkdir -p /var/tmp && tar -x -f /var/tmp/hdf5-1.10.1.tar.bz2 -C /var/tmp -j && \
     cd /var/tmp/hdf5-1.10.1 &&  CC=pgcc CXX=pgc++ F77=pgfortran F90=pgfortran FC=pgfortran ./configure --prefix=/usr/local/hdf5 --enable-cxx --enable-fortran && \
@@ -107,7 +99,7 @@ ENV HDF5_DIR=/usr/local/hdf5 \
 # NetCDF version 4.6.1, NetCDF C++ version 4.3.0, NetCDF Fortran
 # version 4.4.4
 RUN apt-get update -y && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    apt-get install -y --no-install-recommends \
         ca-certificates \
         file \
         libcurl4-openssl-dev \
@@ -116,6 +108,7 @@ RUN apt-get update -y && \
         wget \
         zlib1g-dev && \
     rm -rf /var/lib/apt/lists/*
+
 RUN mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://www.unidata.ucar.edu/downloads/netcdf/ftp/netcdf-4.6.1.tar.gz && \
     mkdir -p /var/tmp && tar -x -f /var/tmp/netcdf-4.6.1.tar.gz -C /var/tmp -z && \
     cd /var/tmp/netcdf-4.6.1 &&  CC=pgcc CPPFLAGS=-I/usr/local/hdf5/include CXX=pgc++ F77=pgfortran F90=pgfortran FC=pgfortran LDFLAGS=-L/usr/local/hdf5/lib ./configure --prefix=/usr/local/netcdf && \
@@ -150,8 +143,9 @@ ENV PATH=/usr/local/bin/:$PATH
 
 # automake 1.13
 RUN apt-get update -y && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        autoconf
+    apt-get install -y --no-install-recommends \
+        autoconf && \
+    rm -rf /var/lib/apt/lists/*
 
 RUN cd /var/tmp && \
     wget http://ftp.gnu.org/gnu/automake/automake-1.13.tar.gz && \
