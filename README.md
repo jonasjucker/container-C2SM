@@ -46,4 +46,4 @@ This information is contained in the following files:
 * [Test and Run COSMO within the container](test_and_run_container.md)
    - How to run the testuite 
    - How to run simulations within the container
-   - Benchmarks of native and containerize COSMO-ORG on Piz Daint
+   - Benchmark for native and containerized COSMO-ORG on Piz Daint
