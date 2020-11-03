@@ -78,3 +78,5 @@ srun -n $NUMBER_OF_PROC -C gpu sarus run --mpi \
 --mount=type=bind,src=$PWD,target=$PWD --workdir=$PWD \
 juckerj/cosmo:gpu bash -c 'export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libcuda.so; export MPICH_RDMA_ENABLED_CUDA=1; cosmo'
 ```
+## Benchmark
+to do
