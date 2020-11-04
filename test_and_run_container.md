@@ -100,9 +100,9 @@ lprefetchio=true -> false
 |  CPU        | run 1   | run 2   | run 3  | average   |
 |-------------|---------|---------|--------|-----------|
 |  container  |19m 18s  |20 m 29s |19m 20s |**19m 41s**|
-|  native     |19m 13s  |      |1.2 GB|2.7 GB   |
+|  native     |19m 13s  |19m 8s   |1.2 GB|2.7 GB   |
 
 |  GPU        | run 1   | run 2   | run 3  | average   |
 |-------------|---------|---------|--------|-----------|
 |  container  |19m 18s  |20 m 29s |19m 20s |**19m 41s**|
-|  native     |19m 13s  |      |1.2 GB|2.7 GB   |
+|  native     |void  |void   |void|void   |
