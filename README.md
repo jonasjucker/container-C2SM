@@ -26,7 +26,7 @@ I discussed this subject with Theofilos-Ioannis Manitaras. His answer was:
 Given that answer a containerized version of COSMO-ORG is a valuable option to keep in mind for the future.
 ## Organization
 This repository consist of three different directories, containing Dockerfiles and a TAG-file to build the images:
-* [External Software Stack](external_swtsack)
+* [External Software Stack](external_swstack)
 * [COSMO for CPU](cosmo_cpu) (no CPP-dyocre)
 * [COSMO for GPU](cosmo_gpu) (with CPP-dycore)
 
