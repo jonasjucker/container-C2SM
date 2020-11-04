@@ -95,7 +95,7 @@ nprocio=2 -> 0
 lasyncio=true -> false  
 lprefetchio=true -> false  
 
-**The benchmarks are meant only to estimate the overhead introduced by the container!**
+**The benchmarks are only meant to estimate the overhead introduced by the container!**
 
 |  CPU        | run 1   | run 2   | run 3  | average   |
 |-------------|---------|---------|--------|-----------|
