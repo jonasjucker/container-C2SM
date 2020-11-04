@@ -97,7 +97,12 @@ lprefetchio=true -> false
 
 **The benchmarks are meant only to estimate the overhead introduced by the container!**
 
-|             | run 1   | run 2   | run 3  | average   |
+|  CPU        | run 1   | run 2   | run 3  | average   |
 |-------------|---------|---------|--------|-----------|
-|CPU container|19m 18s  |20 m 29s |19m 20s |**19m 41s**|
-|CPU native   |19m 13s  |      |1.2 GB|2.7 GB   |
+|  container  |19m 18s  |20 m 29s |19m 20s |**19m 41s**|
+|  native     |19m 13s  |      |1.2 GB|2.7 GB   |
+
+|  GPU        | run 1   | run 2   | run 3  | average   |
+|-------------|---------|---------|--------|-----------|
+|  container  |19m 18s  |20 m 29s |19m 20s |**19m 41s**|
+|  native     |19m 13s  |      |1.2 GB|2.7 GB   |
