@@ -80,7 +80,7 @@ juckerj/cosmo:gpu bash -c 'export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libcuda.s
 ```
 ## Benchmark
 For benchmarking the [official benchmark Jenkins-plan](http://jenkins-mch.cscs.ch/view/cosmo/job/COSMO-ORG_performance_benchmark_daily/) of MeteoSwiss used.
-It consists of a **4 hour forecast with Cosmo-2e**. Due to the differnet architecture of Piz Daint the following namelist parameters had to be adapted:
+It consists of a **4 hour forecast with Cosmo-2e**. Due to the differnet architecture of Piz Daint the following namelist parameters had to be adapted:  
 **CPU**  
 nproma=-1 -> 16  
 nprocx=2  -> 12  
@@ -97,7 +97,7 @@ lprefetchio=true -> false
 
 **The benchmarks are meant only to estimate the overhead introduced by the container!**
 
-|             | run 1   | run 2 | run 3| average |
-|-------------|---------|-------|------|---------|
-|CPU container|19m 18 s |      |1.2 GB|2.7 GB   |
-|CPU native   |19m 18 s |      |1.2 GB|2.7 GB   |
+|             | run 1   | run 2   | run 3  | average   |
+|-------------|---------|---------|--------|-----------|
+|CPU container|19m 18s  |20 m 29s |19m 20s |**19m 41s**|
+|CPU native   |19m 13s  |      |1.2 GB|2.7 GB   |
