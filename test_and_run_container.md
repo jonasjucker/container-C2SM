@@ -79,4 +79,16 @@ srun -n $NUMBER_OF_PROC -C gpu sarus run --mpi \
 juckerj/cosmo:gpu bash -c 'export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libcuda.so; export MPICH_RDMA_ENABLED_CUDA=1; cosmo'
 ```
 ## Benchmark
-to do
+For benchmarking the [official benchmark Jenkins-plan](http://jenkins-mch.cscs.ch/view/cosmo/job/COSMO-ORG_performance_benchmark_daily/) of MeteoSwiss used.
+It consists of a **4 hour forecast with Cosmo-2e**. Due to the differnet architecture of Piz Daint the following namelist parameters had to be adapted:
+**CPU**  
+nproma=-1 -> 16    
+
+**GPU**  
+nprocx=2  -> 4  
+nprocy=2  -> 2  
+nprocio=2 -> 0  
+lasyncio=true -> false  
+lprefetchio=true -> false  
+
+The benchmarks to asses the overhead introduced by the container only.
