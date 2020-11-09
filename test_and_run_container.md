@@ -2,6 +2,20 @@
 The results of COSMO are tested with the regular testsuite. Besides the container image, the [fork](https://github.com/jonasjucker/cosmo/tree/docker)
 of Jonas Jucker is needed as repository to run the testsuite in. One needs the modified mpicmd in the testsuite as well as the testlist *testlist_gpu_noasyncio.xml*.
 
+The modification of the mpicmd takes place in *ts_testcase.py*:
+
+**Original Code**
+```python
+run_cmd=run_cmd + ' ./' + self.executable + ' ' + self.options.args + ' ' + redirect_output
+```
+
+**Modified Code**
+```python
+sarus_cmd=(" bash -c 'export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libcuda.so; export MPICH_RDMA_ENABLED_CUDA=1;") 
+self.executable=("cosmo")
+run_cmd=run_cmd + sarus_cmd +  ' ' + self.executable + "'" + ' ' + self.options.args + ' ' + redirect_output
+
+```
 For the CPU version of the container the original testuite can be uses as well.
 
 ## COSMO (CPU)
