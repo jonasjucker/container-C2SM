@@ -119,4 +119,4 @@ lprefetchio=true -> false
 |  GPU        | run 1   | run 2   | run 3  | average   |
 |-------------|---------|---------|--------|-----------|
 |  container  |2m 10s   |2m 6s    |2m 10s  |**2m 8s**|
-|  native     |-        | -       |-       |-        |
+|  native     |2m 12s   |2m 9s    |2m 9s   |**2m 10s** |
