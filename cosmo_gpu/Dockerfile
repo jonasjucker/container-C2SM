@@ -23,6 +23,31 @@ RUN echo "$ssh_prv_key" > /root/.ssh/id_rsa && \
     chmod 600 /root/.ssh/id_rsa && \
     chmod 600 /root/.ssh/id_rsa.pub
 
+RUN apt-get update -y && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        gfortran-8 \
+        g++-8 \
+        gcc-8 \
+        python3 \
+        python3-numpy \
+        python3-nose \
+        bzip2 \
+        libbz2-dev \
+        tar \
+        wget \
+        zlib1g-dev \
+        python-dev \
+        libxml2-dev \
+        libxslt-dev \
+        git && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 8 && update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 7
+RUN update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 8 && update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 7
+RUN update-alternatives --install /usr/bin/gcc-ranlib gcc-ranlib /usr/bin/gcc-ranlib-8 8 && update-alternatives --install /usr/bin/gcc-ranlib gcc-ranlib /usr/bin/gcc-ranlib-7 7
+RUN update-alternatives --install /usr/bin/gcc-nm gcc-nm /usr/bin/gcc-nm-8 8 && update-alternatives --install /usr/bin/gcc-nm gcc-nm /usr/bin/gcc-nm-7 7
+RUN update-alternatives --install /usr/bin/gcc-ar gcc-ar /usr/bin/gcc-ar-8 8 && update-alternatives --install /usr/bin/gcc-ar gcc-ar /usr/bin/gcc-ar-7 7
+
 # libgrib1
 RUN git clone git@github.com:C2SM-RCM/libgrib1.git /var/tmp/libgrib1 && \
     cp -r /var/tmp/libgrib1/libgrib1_cosmo /usr/local/libgrib1
@@ -64,24 +89,7 @@ ENV GRIB_SAMPLES_PATH=/usr/local/eccodes/eccodes-cosmo-resources/samples/
 ENV PATH=/usr/local/eccodes/bin/:$PATH
 
 # Boost version 1.67.0
-RUN apt-get update -y && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        build-essential \
-        gfortran \
-        python3 \
-        python3-numpy \
-        python3-nose \
-        bzip2 \
-        libbz2-dev \
-        tar \
-        wget \
-        zlib1g-dev \
-        python-dev \
-        libxml2-dev \
-        libxslt-dev \
-        git && \
-    rm -rf /var/lib/apt/lists/*
-
+RUN which gcc && which g++ && gcc --version && g++ --version
 RUN mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://dl.bintray.com/boostorg/release/1.67.0/source/boost_1_67_0.tar.bz2 && \
     mkdir -p /var/tmp && tar -x -f /var/tmp/boost_1_67_0.tar.bz2 -C /var/tmp -j && \
     cd /var/tmp/boost_1_67_0 && \
@@ -99,7 +107,7 @@ RUN apt-get update -y && \
 
 RUN git clone git@github.com:GridTools/gridtools.git /var/tmp/gridtools && \
     cd /var/tmp/gridtools && git checkout 8101c64
-ENV CXX=/usr/bin/g++ CC=/usr/bin/gcc FC=/usr/bin/gfortran CUDACXX=/opt/nvidia/hpc_sdk/Linux_x86_64/20.7/compilers/bin/nvcc CUDAHOSTCXX=/usr/bin/g++
+ENV CXX=/usr/bin/g++ CC=/usr/bin/gcc FC=/usr/bin/gfortran-8 CUDACXX=/opt/nvidia/hpc_sdk/Linux_x86_64/20.7/compilers/bin/nvcc CUDAHOSTCXX=/usr/bin/g++
 RUN cd /var/tmp/gridtools && \
     mkdir build && cd build && \
     cmake -DCUDAToolkit_INCLUDE_DIR=/usr/local/cuda/include \
