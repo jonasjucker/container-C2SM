@@ -1,7 +1,7 @@
 # 
 # HPC COSMO image
 
-FROM juckerj/external_swstack:cuda10.2
+FROM juckerj/external_swstack:cuda10.2_gcc8
 ARG nproc=4
 ARG ssh_prv_key
 ARG ssh_pub_key
@@ -24,24 +24,24 @@ RUN echo "$ssh_prv_key" > /root/.ssh/id_rsa && \
     chmod 600 /root/.ssh/id_rsa.pub
 
 RUN apt-get update -y && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        gfortran-8 \
-        g++-8 \
-        gcc-8 \
-        python3 \
-        python3-numpy \
-        python3-nose \
+    apt-get install -y --no-install-recommends \
         bzip2 \
         libbz2-dev \
-        tar \
-        wget \
-        zlib1g-dev \
-        python-dev \
+        tar  \
+        wget  \
+        libxslt-dev  \
         libxml2-dev \
-        libxslt-dev \
-        git && \
+        libbz2-dev \
+        zlib1g-dev && \
     rm -rf /var/lib/apt/lists/*
 
+RUN apt-get update -y && \
+    apt-get install -y --no-install-recommends \
+       python3  \
+       python-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+# prioritize GCC-8 over other GCC-veersion present
 RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 8 && update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 7
 RUN update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 8 && update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 7
 RUN update-alternatives --install /usr/bin/gcc-ranlib gcc-ranlib /usr/bin/gcc-ranlib-8 8 && update-alternatives --install /usr/bin/gcc-ranlib gcc-ranlib /usr/bin/gcc-ranlib-7 7
